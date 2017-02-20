@@ -2,7 +2,6 @@
 //10110010(2):178
 //   «
 //10110010(3):2514
-
 #include "stdafx.h"
 #include <immintrin.h>
 #include <stdlib.h>
