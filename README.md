@@ -1,1 +1,1 @@
-# SIMD_Practice
+# SIMD
