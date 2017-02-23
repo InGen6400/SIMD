@@ -50,12 +50,10 @@ int main()
 	//16bitx16bit=32bit
 	*mmz = _mm256_hadd_epi32(*mmz, *mmz);
 	*mmz = _mm256_hadd_epi32(*mmz, *mmz);
-	//0バイト目が出力になる
-	index = z[0];
+	//0バイト目と8バイト目がそれぞれの出力になる
+	index = z[0]+z[8];
 
 	printf("%d\n", index);
     return 0;
-
-
 }
 
