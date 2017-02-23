@@ -4,6 +4,7 @@
 //10110010(3):2514
 #include "stdafx.h"
 #include <immintrin.h>
+#include <intrin.h>
 #include <stdlib.h>
 
 #define LEN 16
@@ -25,7 +26,7 @@ void printBit(uint16 *in) {
 
 //データの整形をする  (shift 7, set, and)
 void setData(__m256i *ret, const unsigned char me, const unsigned char opp) {
-
+	
 #pragma region AVX2
 
 	__m256i mme = _mm256_set1_epi16(me);
