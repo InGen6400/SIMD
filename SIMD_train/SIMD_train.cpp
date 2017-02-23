@@ -15,24 +15,46 @@ void printBit(uint16 *in) {
 	char buf[LEN][1000];
 	for (int i = LEN - 1; i >= 0; i--) {
 		itoa(in[i], buf[i], 2);
+		if ((i+1) % 8 == 0) {
+			printf(" ");
+		}
 		printf("%s,", buf[i]);
 	}
 	printf("\n");
 }
 
 //データの整形をする  (shift 7, set, and)
-void setData(__m256i *ret, const unsigned char input1, const unsigned char input2) {
-	//この部分はAVX2で高速化可能だがメインPCがAVX(1)なので断念
-	*ret = _mm256_set_epi16(input2 >> 7, input2 >> 6, input2 >> 5, input2 >> 4, input2 >> 3, input2 >> 2, input2 >> 1, input2, 
-							input1 >> 7, input1 >> 6, input1 >> 5, input1 >> 4, input1 >> 3, input1 >> 2, input1 >> 1, input1);
-	//*ret = _mm256_set1_epi16(0x0001);
+void setData(__m256i *ret, const unsigned char me, const unsigned char opp) {
+
+#pragma region AVX2
+
+	__m256i mme = _mm256_set1_epi16(me);
+	__m256i mopp = _mm256_set1_epi16(opp);
+	const __m256i shifter = _mm256_set_epi32(7, 6, 5, 4, 3, 2, 1, 0);
+
+	*ret = _mm256_unpackhi_epi16(mme, mopp);
+
+	*ret = _mm256_srlv_epi32(*ret, shifter);
+
 	*ret = _mm256_and_si256(*ret, _mm256_set1_epi16(0x0001));
+
+#pragma endregion
+
+#pragma region AVX1
+	/*
+	//この部分はAVX2で高速化可能だがメインPCがAVX(1)なので断念
+	*ret = _mm256_set_epi16(me >> 7, me >> 6, me >> 5, me >> 4, me >> 3, me >> 2, me >> 1, me,
+		opp >> 7, opp >> 6, opp >> 5, opp >> 4, opp >> 3, opp >> 2, opp >> 1, opp);
+	*ret = _mm256_and_si256(*ret, _mm256_set1_epi16(0x0001));
+	*/
+#pragma endregion
 }
 
 int main()
 {
 
-	alignas(16) const uint16 pow_3[LEN] = { 0x1*2, 0x3*2, 0x9*2, 0x1b*2, 0x51*2, 0xf3*2, 0x2d9*2, 0x88b*2, 0x1, 0x3, 0x9, 0x1b, 0x51, 0xf3, 0x2d9, 0x88b };//(1,3,9,27,81,243,729,2187)*2 と1,3,9,27,81,243,729,2187
+	alignas(16) const uint16 pow_3[LEN] = { 0x1,  0x1 * 2,  0x3,  0x3 * 2,  0x9,   0x9 * 2,   0x1b,  0x1b * 2,
+											0x51, 0x51 * 2, 0xf3, 0xf3 * 2, 0x2d9, 0x2d9 * 2, 0x88b, 0x88b * 2 };//(1,3,9,27,81,243,729,2187)*2 と1,3,9,27,81,243,729,2187
 	alignas(16) uint16 y[LEN] = { 0 };
 	alignas(16) uint16 z[LEN] = { 0 };
 	int index;//計算結果のインデックス値
@@ -43,7 +65,7 @@ int main()
 	__m256i *mmz = (__m256i *)z;
 
 	//データの整形
-	setData(mmy, 0b00000000, 0b00000000);
+	setData(mmy, 0b00000000, 0b11111111);
 	printBit(y);
 	//それぞれの積の和
 	*mmz = _mm256_madd_epi16(*mmx, *mmy);
