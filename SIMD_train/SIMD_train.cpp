@@ -24,6 +24,14 @@ void printBit(uint16 *in) {
 	printf("\n");
 }
 
+char getReverse(char in) {
+	char data;
+	data = ((in & 0x55) << 1) | ((in & 0xAA) >> 1);
+	data = ((data & 0x33) << 2) | ((data & 0xCC) >> 2);
+	data = ((data & 0x0F) << 4) | ((data & 0xF0) >> 4);
+	return data;
+}
+
 //データの整形をする  (shift 7, set, and)
 void setData(__m256i *ret, const unsigned char me, const unsigned char opp) {
 	
@@ -66,8 +74,8 @@ int main()
 	__m256i *mmz = (__m256i *)z;
 
 	//データの整形
-	setData(mmy, 0b00000000, 0b11111111);
-	printBit(y);
+	//setData(mmy, 0b00000000, 0b11111111);
+	/*
 	//それぞれの積の和
 	*mmz = _mm256_madd_epi16(*mmx, *mmy);
 	//16bitx16bit=32bit
@@ -75,8 +83,10 @@ int main()
 	*mmz = _mm256_hadd_epi32(*mmz, *mmz);
 	//0バイト目と8バイト目がそれぞれの出力になる
 	index = z[0]+z[8];
-
-	printf("%d\n", index);
+	*/
+	z[0] = getReverse(0b00110010);
+	printBit(z);
+	//printf("%d\n", index);
     return 0;
 }
 
