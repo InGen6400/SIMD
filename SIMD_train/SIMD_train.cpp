@@ -91,14 +91,14 @@ int main()
 	*/
 	//z[0] = getReverse(0b00110010);
 
-	unsigned char in = 0b11001101;
+	unsigned char in = 0b11000101;
 
 
-	z[0] = getReverse(in);
+	//z[0] = getReverse(in);
 
-	z[0] = delta_swap(z[0], 0b00100000, 2);
-	z[0] = delta_swap(z[0], 0b00000100, 2);
-	z[0] = delta_swap(z[0], 0b00000001, 1);
+	z[0] = delta_swap(in, 0b00010000, 2);
+	z[0] = delta_swap(z[0], 0b00000001, 2);
+	z[0] = delta_swap(z[0], 0b00000010, 4);
 
 	printBit(z);
 	//printf("%d\n", index);
