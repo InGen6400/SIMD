@@ -24,8 +24,13 @@ void printBit(uint16 *in) {
 	printf("\n");
 }
 
-char getReverse(char in) {
-	char data;
+unsigned char delta_swap(unsigned char bits, unsigned char mask, int delta) {
+	unsigned char x = (bits ^ (bits >> delta)) & mask;
+	return bits ^ x ^ (x << delta);
+}
+
+unsigned char getReverse(unsigned char in) {
+	unsigned char data;
 	data = ((in & 0x55) << 1) | ((in & 0xAA) >> 1);
 	data = ((data & 0x33) << 2) | ((data & 0xCC) >> 2);
 	data = ((data & 0x0F) << 4) | ((data & 0xF0) >> 4);
@@ -69,9 +74,9 @@ int main()
 	int index;//計算結果のインデックス値
 
 	//レジストリに登録
-	__m256i *mmx = (__m256i *)pow_3;
-	__m256i *mmy = (__m256i *)y;
-	__m256i *mmz = (__m256i *)z;
+	//__m256i *mmx = (__m256i *)pow_3;
+	//__m256i *mmy = (__m256i *)y;
+	//__m256i *mmz = (__m256i *)z;
 
 	//データの整形
 	//setData(mmy, 0b00000000, 0b11111111);
@@ -84,7 +89,17 @@ int main()
 	//0バイト目と8バイト目がそれぞれの出力になる
 	index = z[0]+z[8];
 	*/
-	z[0] = getReverse(0b00110010);
+	//z[0] = getReverse(0b00110010);
+
+	unsigned char in = 0b11001101;
+
+
+	z[0] = getReverse(in);
+
+	z[0] = delta_swap(z[0], 0b00100000, 2);
+	z[0] = delta_swap(z[0], 0b00000100, 2);
+	z[0] = delta_swap(z[0], 0b00000001, 1);
+
 	printBit(z);
 	//printf("%d\n", index);
     return 0;
